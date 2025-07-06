@@ -1,0 +1,33 @@
+{
+  "main": "index.html",
+  "preload": "preload/services.js",
+  "logo": "logo.png",
+  "development": {
+    "main": "http://localhost:5173"
+  },
+  "features": [
+    {
+      "code": "any_json_parse",
+      "explain": "json文件预览",
+      "cmds": [
+        "选择json文件",
+        {
+          "type": "regex",
+          "label": "通过绝对路径选择json文件",
+          "match": "/^[\\w/-_]+\\.json$/i"
+        },
+        {
+          "type": "files",
+          "label": "json文件预览",
+          "fileType": "file",
+          "extensions": [".json"]
+        },
+        {
+          "type": "regex",
+          "label": "json内容预览",
+          "match": "/^[\\{\\[].*[\\}\\]]$/i"
+        }
+      ]
+    }
+  ]
+}
