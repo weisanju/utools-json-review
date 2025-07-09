@@ -11,6 +11,9 @@ function TreeNode({ data, name, onPreview, level = 0 }) {
     // 判断是否为简单类型或短文本
     const isSimpleOrShort = !isObject && (typeof data === 'string' ? data.length <= 20 : true);
 
+    // 识别链接的正则
+    const urlRegex = /^(https?:\/\/|www\.)[\w\-]+(\.[\w\-]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/i;
+
     const handleClick = (e) => {
         e.stopPropagation();
         if (isSimpleOrShort) return; // 简单类型或短文本不弹窗
@@ -38,6 +41,19 @@ function TreeNode({ data, name, onPreview, level = 0 }) {
         return JSON.stringify(val);
     };
 
+    // 判断是否为链接
+    const isLink = typeof data === 'string' && urlRegex.test(data);
+
+    // 链接点击处理
+    const handleLinkClick = (e) => {
+        if (typeof window.utools !== 'undefined' && window.utools.shellOpenExternal) {
+            e.preventDefault();
+            const url = data.startsWith('http') ? data : `http://${data}`;
+            window.utools.shellOpenExternal(url);
+        }
+        // 否则，默认行为（浏览器新标签页）
+    };
+
     return (
         <div style={{ marginLeft: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', cursor: isSimpleOrShort ? 'default' : 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -50,12 +66,33 @@ function TreeNode({ data, name, onPreview, level = 0 }) {
                 >{name !== undefined ? name + ':' : ''}</span>
                 {/* 只做缩略展示，不做markdown渲染 */}
                 {!isObject && (
-                    <span
-                        onClick={handleClick}
-                        style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 300, color: '#666', cursor: isSimpleOrShort ? 'default' : 'pointer' }}
-                    >
-                        {getSummary(data)}
-                    </span>
+                    isLink ? (
+                        <a
+                            href={data.startsWith('http') ? data : `http://${data}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                flex: 1,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: 300,
+                                color: '#1a73e8',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                            }}
+                            onClick={handleLinkClick}
+                        >
+                            {getSummary(data)}
+                        </a>
+                    ) : (
+                        <span
+                            onClick={handleClick}
+                            style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 300, color: '#666', cursor: isSimpleOrShort ? 'default' : 'pointer' }}
+                        >
+                            {getSummary(data)}
+                        </span>
+                    )
                 )}
                 {/* 复制按钮，所有节点都可复制 */}
                 <button

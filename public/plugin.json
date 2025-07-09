@@ -2,7 +2,7 @@
   "main": "index.html",
   "preload": "preload/services.js",
   "logo": "logo.png",
-  "development": {
+  "development1": {
     "main": "http://localhost:5173"
   },
   "features": [
@@ -25,7 +25,7 @@
         {
           "type": "regex",
           "label": "json内容预览",
-          "match": "/^[\\{\\[].*[\\}\\]]$/i"
+          "match": "/^\\s*[\\{\\[][\\s\\S]*[\\}\\]]\\s*$/m"
         }
       ]
     }
